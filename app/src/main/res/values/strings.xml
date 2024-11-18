@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Corrector Examenes Mobile</string>
+    <string name="descriptionImageLogo">Logo Universae</string>
+    <string name="descriptionImagePlantilla">Plantilla vacia Universae</string>
+    <string name="plantillaString">Añadir plantilla</string>
+    <string name="examenString">Añadir examen</string>
+    <string name="corregirString">Corregir examen</string>
 </resources>
