@@ -18,7 +18,9 @@
         android:layout_marginBottom="15dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        tools:ignore="UselessParent">
+        tools:ignore="UselessParent"
+        android:paddingTop="10dp"
+        android:paddingStart="20dp">
 
         <ImageView
             android:id="@+id/logo"
@@ -54,7 +56,8 @@
         android:layout_gravity="center"
         android:orientation="horizontal"
         tools:ignore="UselessLeaf"
-        android:gravity="center">
+        android:gravity="center"
+        android:paddingTop="40dp">
 
         <ImageView
             android:layout_width="match_parent"
@@ -73,25 +76,65 @@
         android:layout_weight="1"
         android:gravity="center"
         android:orientation="vertical"
-        android:paddingLeft="50dp"
-        android:paddingRight="50dp"
         tools:ignore="InefficientWeight"
         >
 
         <Button
-            android:layout_width="match_parent"
+            android:id="@+id/platillaButton"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
             android:background="@drawable/rounded_button_background_selector"
             android:fontFamily="@font/raleway_extrabold"
             android:text="@string/plantillaString"
             android:textColor="@drawable/text_color"
-            android:layout_gravity="center">
+            android:layout_gravity="center"
+            android:visibility="visible">
 
         </Button>
 
-        <Button
+        <LinearLayout
+            style="?android:attr/buttonBarStyle"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="bottom">
+
+            <Button
+                android:id="@+id/galeriaButton"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:layout_marginEnd="0dp"
+                android:visibility="gone"
+                android:background="@drawable/rounded_button_background_selector"
+                android:fontFamily="@font/raleway_extrabold"
+                android:textColor="@drawable/text_color"
+                android:text="@string/galeriaString"
+                android:layout_marginBottom="5dp" />
+
+            <Button
+                android:id="@+id/fotoButton"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:layout_marginStart="0dp"
+                android:visibility="gone"
+                android:background="@drawable/rounded_button_background_selector"
+                android:fontFamily="@font/raleway_extrabold"
+                android:textColor="@drawable/text_color"
+                android:text="@string/fotoString"
+                android:layout_marginBottom="5dp"/>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/examenButton"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:background="@drawable/rounded_button_background_selector"
@@ -102,8 +145,46 @@
 
         </Button>
 
-        <Button
+        <LinearLayout
+            style="?android:attr/buttonBarStyle"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/galeriaButton2"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:layout_marginEnd="0dp"
+                android:visibility="gone"
+                android:background="@drawable/rounded_button_background_selector"
+                android:fontFamily="@font/raleway_extrabold"
+                android:textColor="@drawable/text_color"
+                android:text="@string/galeriaString"
+                android:layout_marginBottom="5dp" />
+
+            <Button
+                android:id="@+id/fotoButton2"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:layout_marginStart="0dp"
+                android:visibility="gone"
+                android:background="@drawable/rounded_button_background_selector"
+                android:fontFamily="@font/raleway_extrabold"
+                android:textColor="@drawable/text_color"
+                android:text="@string/fotoString"
+                android:layout_marginBottom="5dp"/>
+
+        </LinearLayout>
+
+        <Button
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:background="@drawable/rounded_button_background_selector"
             android:fontFamily="@font/raleway_extrabold"
