@@ -152,14 +152,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         binding.platillaButton.setOnClickListener(v -> {
-            //Ocultar boton
+            // Restaurar botón de examen si está dividido
+            restaurarBotonExamen();
+
+            // Ocultar botón de plantilla y mostrar sus botones
             binding.platillaButton.animate()
                     .alpha(0f)
                     .setDuration(300)
                     .withEndAction(() -> {
                         binding.platillaButton.setVisibility(View.GONE);
 
-                        //Mostrar neuvos botones
+                        // Mostrar nuevos botones
                         binding.fotoButton.setVisibility(View.VISIBLE);
                         binding.galeriaButton.setVisibility(View.VISIBLE);
 
@@ -176,14 +179,17 @@ public class MainActivity extends AppCompatActivity {
         });
 
         binding.examenButton.setOnClickListener(v -> {
-            //Ocultar boton
+            // Restaurar botón de plantilla si está dividido
+            restaurarBotonPlantilla();
+
+            // Ocultar botón de examen y mostrar sus botones
             binding.examenButton.animate()
                     .alpha(0f)
                     .setDuration(300)
                     .withEndAction(() -> {
                         binding.examenButton.setVisibility(View.GONE);
 
-                        //Mostrar neuvos botones
+                        // Mostrar nuevos botones
                         binding.fotoButton2.setVisibility(View.VISIBLE);
                         binding.galeriaButton2.setVisibility(View.VISIBLE);
 
@@ -287,6 +293,42 @@ public class MainActivity extends AppCompatActivity {
         return path;
     }
 
+    // Método para restaurar el botón de plantilla
+    private void restaurarBotonPlantilla() {
+        if (binding.fotoButton.getVisibility() == View.VISIBLE ||
+                binding.galeriaButton.getVisibility() == View.VISIBLE) {
 
+            // Ocultar botones divididos instantáneamente
+            binding.fotoButton.setVisibility(View.GONE);
+            binding.galeriaButton.setVisibility(View.GONE);
+
+            // Restaurar posiciones originales
+            binding.fotoButton.setTranslationX(0f);
+            binding.galeriaButton.setTranslationX(0f);
+
+            // Mostrar botón principal instantáneamente
+            binding.platillaButton.setVisibility(View.VISIBLE);
+            binding.platillaButton.setAlpha(1f);
+        }
+    }
+
+    // Método para restaurar el botón de examen
+    private void restaurarBotonExamen() {
+        if (binding.fotoButton2.getVisibility() == View.VISIBLE ||
+                binding.galeriaButton2.getVisibility() == View.VISIBLE) {
+
+            // Ocultar botones divididos instantáneamente
+            binding.fotoButton2.setVisibility(View.GONE);
+            binding.galeriaButton2.setVisibility(View.GONE);
+
+            // Restaurar posiciones originales
+            binding.fotoButton2.setTranslationX(0f);
+            binding.galeriaButton2.setTranslationX(0f);
+
+            // Mostrar botón principal instantáneamente
+            binding.examenButton.setVisibility(View.VISIBLE);
+            binding.examenButton.setAlpha(1f);
+        }
+    }
 
 }
