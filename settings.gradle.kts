@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Corrector Examenes Mobile"
 include(":app")
+include(":openCv490")

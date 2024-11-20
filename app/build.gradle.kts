@@ -20,6 +20,8 @@ android {
         }
     }
 
+    ndkVersion = "21.4.7075529"
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -61,6 +63,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.appcompat)
+    implementation(project(":openCv490"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -24,6 +24,8 @@ import java.util.Locale;
 
 import com.example.correctorexamenesmobile.databinding.ActivityMainBinding;
 
+import org.opencv.android.OpenCVLoader;
+
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
 
@@ -150,6 +152,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        Log.i("OpenCV", OpenCVLoader.initLocal()
+                ? "OpenCV cargado correctamente"
+                : "OpenCV no se ha cargado correctamente");
 
         binding.platillaButton.setOnClickListener(v -> {
             // Restaurar botón de examen si está dividido

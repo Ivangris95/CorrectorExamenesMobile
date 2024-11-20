@@ -18,7 +18,7 @@
         android:theme="@style/Theme.CorrectorExamenesMobile"
         tools:targetApi="31">
         <activity
-            android:name=".ui.correction.MainActivity"
+            android:name=".ui.test.TestOpenCVActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.CorrectorExamenesMobile">
