@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import java.io.File;
@@ -25,6 +26,8 @@ import java.util.Locale;
 import com.example.correctorexamenesmobile.databinding.ActivityMainBinding;
 
 import org.opencv.android.OpenCVLoader;
+
+
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
@@ -40,112 +43,8 @@ public class MainActivity extends AppCompatActivity {
     // Variable para saber qué imagen estamos procesando
     private boolean isPlantilla = true;
 
-    private final ActivityResultLauncher<Intent> pickImageLauncher =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    Uri imageUri = result.getData().getData();
-                    try {
-                        // Guardar URI y path según el botón que se presionó
-                        if (isPlantilla) {
-                            plantillaUri = imageUri;
-                            plantillaPhotoPath = getRealPathFromUri(plantillaUri);
-                            Log.i("RUTA_IMAGEN", "Ruta de plantilla: " + plantillaPhotoPath);
-                            Log.i("RUTA_IMAGEN", "Uri de plantilla: " + plantillaUri.toString());
-                            Toast.makeText(this, "Plantilla guardada: " + plantillaPhotoPath, Toast.LENGTH_SHORT).show();
-                        } else {
-                            examenUri = imageUri;
-                            examenPhotoPath = getRealPathFromUri(examenUri);
-                            Log.i("RUTA_IMAGEN", "Ruta de examen: " + examenPhotoPath);
-                            Log.i("RUTA_IMAGEN", "Uri de examen: " + examenUri.toString());
-                            Toast.makeText(this, "Examen guardado: " + examenPhotoPath, Toast.LENGTH_SHORT).show();
-                        }
-
-                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-                        int targetW = binding.imgView.getWidth();
-                        int targetH = binding.imgView.getHeight();
-
-                        if (targetW > 0 && targetH > 0) {
-                            Bitmap resizedBitmap = resizeBitmap(bitmap, targetW, targetH);
-                            binding.imgView.setImageBitmap(resizedBitmap);
-                        } else {
-                            binding.imgView.post(() -> {
-                                int width = binding.imgView.getWidth();
-                                int height = binding.imgView.getHeight();
-                                Bitmap resizedBitmap = resizeBitmap(bitmap, width, height);
-                                binding.imgView.setImageBitmap(resizedBitmap);
-                            });
-                        }
-                        binding.imgView.setVisibility(View.VISIBLE);
-                    } catch (Exception e) {
-                        Toast.makeText(this, "Error al cargar la imagen: " + e.getMessage(),
-                                Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-
-    // Launcher para permisos de cámara
-    private final ActivityResultLauncher<String> requestPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    abrirCamara();
-                } else {
-                    Toast.makeText(this, "Se necesita permiso de cámara", Toast.LENGTH_SHORT).show();
-                }
-            });
-
-    // Launcher para la cámara
-    private final ActivityResultLauncher<Intent> takePictureLauncher =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    Bundle extras = result.getData().getExtras();
-                    Bitmap imageBitmap = (Bitmap) extras.get("data");
-                    if (imageBitmap != null) {
-                        try {
-                            // Guardar la imagen y obtener su path
-                            File photoFile = createImageFile();
-                            if (photoFile != null) {
-                                FileOutputStream fos = new FileOutputStream(photoFile);
-                                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-                                fos.close();
-
-                                // Guardar path según el botón que se presionó
-                                if (isPlantilla) {
-                                    plantillaPhotoPath = photoFile.getAbsolutePath();
-                                    plantillaUri = Uri.fromFile(photoFile);
-                                    Log.i("RUTA_IMAGEN", "Ruta de plantilla (cámara): " + plantillaPhotoPath);
-                                    Log.i("URI_IMAGEN", "URI de plantilla (cámara): " + plantillaUri.toString());
-                                    Toast.makeText(this, "Plantilla guardada: " + plantillaPhotoPath, Toast.LENGTH_SHORT).show();
-                                } else {
-                                    examenPhotoPath = photoFile.getAbsolutePath();
-                                    examenUri = Uri.fromFile(photoFile);
-                                    Log.i("RUTA_IMAGEN", "Ruta de examen (cámara): " + examenPhotoPath);
-                                    Log.i("URI_IMAGEN", "URI de examen (cámara): " + examenUri.toString());
-                                    Toast.makeText(this, "Examen guardado: " + examenPhotoPath, Toast.LENGTH_SHORT).show();
-                                }
-                            }
-
-                            int targetW = binding.imgView.getWidth();
-                            int targetH = binding.imgView.getHeight();
-
-                            if (targetW > 0 && targetH > 0) {
-                                Bitmap resizedBitmap = resizeBitmap(imageBitmap, targetW, targetH);
-                                binding.imgView.setImageBitmap(resizedBitmap);
-                            } else {
-                                binding.imgView.post(() -> {
-                                    int width = binding.imgView.getWidth();
-                                    int height = binding.imgView.getHeight();
-                                    Bitmap resizedBitmap = resizeBitmap(imageBitmap, width, height);
-                                    binding.imgView.setImageBitmap(resizedBitmap);
-                                });
-                            }
-                            binding.imgView.setVisibility(View.VISIBLE);
-                        } catch (IOException e) {
-                            Toast.makeText(this, "Error al guardar la imagen: " + e.getMessage(),
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }
-            });
+    private static final int PERMISSION_REQUEST_CODE = 100;
+    private static final int REQUEST_CODE_GALLERY = 123;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
                 : "OpenCV no se ha cargado correctamente");
 
         binding.platillaButton.setOnClickListener(v -> {
+
             // Restaurar botón de examen si está dividido
             restaurarBotonExamen();
 
@@ -233,17 +133,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void abrirGaleria() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.setType("image/*");
-        try {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            // Solicitar permiso de acceso al almacenamiento externo
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_GALLERY);
+        } else {
+            // Abrir el selector de imágenes
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("image/*");
             pickImageLauncher.launch(intent);
-        } catch (Exception e) {
-            Toast.makeText(this, "Error al abrir la galería: " + e.getMessage(),
-                    Toast.LENGTH_SHORT).show();
         }
     }
 
-    // Método para redimensionar la imagen manteniendo la relación de aspecto
+    // Metodo para redimensionar la imagen manteniendo la relación de aspecto
     private Bitmap resizeBitmap(Bitmap bitmap, int targetWidth, int targetHeight) {
         float scaleFactor = Math.min(
                 targetWidth / (float) bitmap.getWidth(),
@@ -280,12 +182,11 @@ public class MainActivity extends AppCompatActivity {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
+        return File.createTempFile(
                 imageFileName,
                 ".jpg",
                 storageDir
         );
-        return image;
     }
 
     private String getRealPathFromUri(Uri uri) {
@@ -299,7 +200,120 @@ public class MainActivity extends AppCompatActivity {
         return path;
     }
 
-    // Método para restaurar el botón de plantilla
+    private final ActivityResultLauncher<Intent> pickImageLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    Uri imageUri = result.getData().getData();
+                    try {
+
+                        // Guardar URI y path según el botón que se presionó
+                        if (isPlantilla) {
+                            plantillaUri = imageUri;
+                            plantillaPhotoPath = getRealPathFromUri(plantillaUri);
+
+                            Log.i("RUTA_IMAGEN", "Ruta de plantilla: " + plantillaPhotoPath);
+                            Log.i("RUTA_IMAGEN", "Uri de plantilla: " + plantillaUri.toString());
+
+                            Toast.makeText(this, "Plantilla guardada: " + plantillaPhotoPath, Toast.LENGTH_SHORT).show();
+
+                        } else {
+                            examenUri = imageUri;
+                            examenPhotoPath = getRealPathFromUri(examenUri);
+
+                            Log.i("RUTA_IMAGEN", "Ruta de examen: " + examenPhotoPath);
+                            Log.i("RUTA_IMAGEN", "Uri de examen: " + examenUri.toString());
+
+                            Toast.makeText(this, "Examen guardado: " + examenPhotoPath, Toast.LENGTH_SHORT).show();
+                        }
+
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                        int targetW = binding.imgView.getWidth();
+                        int targetH = binding.imgView.getHeight();
+
+                        if (targetW > 0 && targetH > 0) {
+                            Bitmap resizedBitmap = resizeBitmap(bitmap, targetW, targetH);
+                            binding.imgView.setImageBitmap(resizedBitmap);
+                        } else {
+                            binding.imgView.post(() -> {
+                                int width = binding.imgView.getWidth();
+                                int height = binding.imgView.getHeight();
+                                Bitmap resizedBitmap = resizeBitmap(bitmap, width, height);
+                                binding.imgView.setImageBitmap(resizedBitmap);
+                            });
+                        }
+                        binding.imgView.setVisibility(View.VISIBLE);
+                    } catch (Exception e) {
+                        Toast.makeText(this, "Error al cargar la imagen: " + e.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+    // Launcher para permisos de cámara
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    abrirCamara();
+                } else {
+                    Toast.makeText(this, "Se necesita permiso de cámara", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+    // Launcher para la cámara
+    private final ActivityResultLauncher<Intent> takePictureLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    Intent data = result.getData();
+                    if (data != null) {
+                        Bitmap imageBitmap = data.getParcelableExtra(Intent.EXTRA_STREAM);
+                        if (imageBitmap != null) {
+                            try {
+                                // Guardar la imagen y obtener su path
+                                File photoFile = createImageFile();
+                                FileOutputStream fos = new FileOutputStream(photoFile);
+                                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                                fos.close();
+
+                                // Guardar path según el botón que se presionó
+                                if (isPlantilla) {
+                                    plantillaPhotoPath = photoFile.getAbsolutePath();
+                                    plantillaUri = Uri.fromFile(photoFile);
+                                    Log.i("RUTA_IMAGEN", "Ruta de plantilla (cámara): " + plantillaPhotoPath);
+                                    Log.i("URI_IMAGEN", "URI de plantilla (cámara): " + plantillaUri.toString());
+                                    Toast.makeText(this, "Plantilla guardada: " + plantillaPhotoPath, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    examenPhotoPath = photoFile.getAbsolutePath();
+                                    examenUri = Uri.fromFile(photoFile);
+                                    Log.i("RUTA_IMAGEN", "Ruta de examen (cámara): " + examenPhotoPath);
+                                    Log.i("URI_IMAGEN", "URI de examen (cámara): " + examenUri.toString());
+                                    Toast.makeText(this, "Examen guardado: " + examenPhotoPath, Toast.LENGTH_SHORT).show();
+                                }
+
+                                int targetW = binding.imgView.getWidth();
+                                int targetH = binding.imgView.getHeight();
+
+                                if (targetW > 0 && targetH > 0) {
+                                    Bitmap resizedBitmap = resizeBitmap(imageBitmap, targetW, targetH);
+                                    binding.imgView.setImageBitmap(resizedBitmap);
+                                } else {
+                                    binding.imgView.post(() -> {
+                                        int width = binding.imgView.getWidth();
+                                        int height = binding.imgView.getHeight();
+                                        Bitmap resizedBitmap = resizeBitmap(imageBitmap, width, height);
+                                        binding.imgView.setImageBitmap(resizedBitmap);
+                                    });
+                                }
+                                binding.imgView.setVisibility(View.VISIBLE);
+                            } catch (IOException e) {
+                                Toast.makeText(this, "Error al guardar la imagen: " + e.getMessage(),
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                }
+            });
+
+    // Metodo para restaurar el botón de plantilla
     private void restaurarBotonPlantilla() {
         if (binding.fotoButton.getVisibility() == View.VISIBLE ||
                 binding.galeriaButton.getVisibility() == View.VISIBLE) {
@@ -318,7 +332,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Método para restaurar el botón de examen
+    // Metodo para restaurar el botón de examen
     private void restaurarBotonExamen() {
         if (binding.fotoButton2.getVisibility() == View.VISIBLE ||
                 binding.galeriaButton2.getVisibility() == View.VISIBLE) {

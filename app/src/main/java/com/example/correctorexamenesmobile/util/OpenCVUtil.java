@@ -15,7 +15,7 @@ import java.util.Objects;
 public class OpenCVUtil {
     private static final String TAG = "OpenCVUtil";
 
-    public static Mat setAñadirBlurALaImagen(Mat imagen) {
+    public static Mat setAnadirBlurALaImagen(Mat imagen) {
         Mat imagenConBlur = new Mat();
 
         try {
